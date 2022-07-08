@@ -54,6 +54,7 @@ namespace Entry.Controllers
             using (var client = new HttpClient())
             {
                 var response = client.PostAsJsonAsync<PersonModelContext>(url + path, model).Result;
+                var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
                 if (response.IsSuccessStatusCode)
                 {
                     return Ok(model);
@@ -64,15 +65,13 @@ namespace Entry.Controllers
         [HttpPut("Edit Person")]
         public ActionResult EditPerson(PersonModelContext person, int id)
         {
-            //first find if the id is found
             using (var client = new HttpClient())
             {
                 var response = client.GetAsync(url + path + id.ToString()).Result;
                 if (response != null)
                 {
-                    //  var result = response.Content.ReadAsStringAsync().Result;
                     var responseadd = client.PutAsJsonAsync<PersonModelContext>(url + path + id.ToString(), person).Result;
-                    var responsejson = JsonConvert.SerializeObject(person);
+                    var responsejson = JsonConvert.DeserializeObject(responseadd.Content.ReadAsStringAsync().Result);
                     return Ok(responsejson);
                 }
                 return BadRequest($"The Person with id {id} is not found");
@@ -91,8 +90,8 @@ namespace Entry.Controllers
                     var responseadd = client.DeleteAsync(url + path + id.ToString()).Result;
                     //   var responseobject = response.Content.ReadAsStringAsync().Result;
                     //  var responsejson = JsonConvert.SerializeObject(responseadd).Result;
-
-                    return Ok(responseadd.Content.ReadAsStringAsync().Result);
+                    var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
+                    return Ok(result);
                 }
                 return BadRequest($"The Person with id {id} is not found");
             }
