@@ -8,7 +8,7 @@ namespace Entry.Controllers
     public class PersonController : ControllerBase
     {
         static string url = "https://62c6b96d74e1381c0a67231a.mockapi.io/";
-        static string path = "User/";
+        //static string path = "User/";
         static string userpath = "User";
 
         [HttpGet("All Persons")]
@@ -33,7 +33,7 @@ namespace Entry.Controllers
         {
             using (var client = new HttpClient())
             {
-                var clientresponse = await client.GetAsync(url + path + id.ToString());
+                var clientresponse = await client.GetAsync($"{url}{userpath}/{id.ToString()}");
                 if (clientresponse.IsSuccessStatusCode)
                 {
 
@@ -53,7 +53,7 @@ namespace Entry.Controllers
         {
             using (var client = new HttpClient())
             {
-                var response = client.PostAsJsonAsync<PersonModelContext>(url + path, model).Result;
+                var response = client.PostAsJsonAsync<PersonModelContext>($"{url}{userpath}/", model).Result;
                 var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
                 if (response.IsSuccessStatusCode)
                 {
@@ -67,10 +67,11 @@ namespace Entry.Controllers
         {
             using (var client = new HttpClient())
             {
-                var response = client.GetAsync(url + path + id.ToString()).Result;
+
+                var response = client.GetAsync($"{url}{userpath}/{id}").Result;
                 if (response != null)
                 {
-                    var responseadd = client.PutAsJsonAsync<PersonModelContext>(url + path + id.ToString(), person).Result;
+                    var responseadd = client.PutAsJsonAsync<PersonModelContext>($"({url}{userpath}/{id.ToString()}", person).Result;
                     var responsejson = JsonConvert.DeserializeObject(responseadd.Content.ReadAsStringAsync().Result);
                     return Ok(responsejson);
                 }
@@ -83,16 +84,22 @@ namespace Entry.Controllers
         {
             using (var client = new HttpClient())
             {
-                var response = client.GetAsync(url + path + id.ToString()).Result;
-                if (response.IsSuccessStatusCode)
+                var httresponsemessage = client.GetAsync($"{url}{userpath}/{id.ToString()}");
+                if (httresponsemessage.IsCompletedSuccessfully)
                 {
+                    var response = httresponsemessage.Result;
+                    if (response.IsSuccessStatusCode)
+                    {
 
-                    var responseadd = client.DeleteAsync(url + path + id.ToString()).Result;
-                    //   var responseobject = response.Content.ReadAsStringAsync().Result;
-                    //  var responsejson = JsonConvert.SerializeObject(responseadd).Result;
-                    var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
-                    return Ok(result);
+                        var responseadd = client.DeleteAsync($"({url}{userpath}/{id.ToString()})").Result;
+                        //   var responseobject = response.Content.ReadAsStringAsync().Result;
+                        //  var responsejson = JsonConvert.SerializeObject(responseadd).Result;
+                        var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
+                        return Ok(result);
+                    }
+                    return BadRequest($"The Person with id {id} was not found");
                 }
+
                 return BadRequest($"The Person with id {id} is not found");
             }
         }
