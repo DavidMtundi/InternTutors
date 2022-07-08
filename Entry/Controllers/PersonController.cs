@@ -1,6 +1,5 @@
 ﻿using BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Entry.Controllers
 {
@@ -19,9 +18,8 @@ namespace Entry.Controllers
                 HttpResponseMessage responsemessage = client.GetAsync(url + userpath).Result;
                 if (responsemessage.IsSuccessStatusCode)
                 {
-                    var response = responsemessage.Content.ReadAsStringAsync().Result;
-                    var result = JsonConvert.DeserializeObject<List<PersonModel>>(response);
-                    return Ok(result);
+                    var response = responsemessage.Content.ReadFromJsonAsync<List<PersonModel>>().Result;
+                    return Ok(response);
                 }
                 return BadRequest();
 
@@ -37,9 +35,8 @@ namespace Entry.Controllers
                 if (clientresponse.IsSuccessStatusCode)
                 {
 
-                    var response = clientresponse.Content.ReadAsStringAsync().Result;
-                    var result = JsonConvert.DeserializeObject<PersonModel>(response);
-                    return Ok(result);
+                    var response = await clientresponse.Content.ReadFromJsonAsync<PersonModel>();
+                    return Ok(response);
 
                 }
                 return BadRequest("Sorry the Person with id {id} cannot be found");
@@ -54,7 +51,8 @@ namespace Entry.Controllers
             using (var client = new HttpClient())
             {
                 var response = client.PostAsJsonAsync<PersonModelContext>($"{url}{userpath}/", model).Result;
-                var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
+
+                var result = response.Content.ReadFromJsonAsync<PersonModel>();
                 if (response.IsSuccessStatusCode)
                 {
                     return Ok(model);
@@ -72,7 +70,7 @@ namespace Entry.Controllers
                 if (response != null)
                 {
                     var responseadd = client.PutAsJsonAsync<PersonModelContext>($"({url}{userpath}/{id.ToString()}", person).Result;
-                    var responsejson = JsonConvert.DeserializeObject(responseadd.Content.ReadAsStringAsync().Result);
+                    var responsejson = responseadd.Content.ReadFromJsonAsync<PersonModel>();
                     return Ok(responsejson);
                 }
                 return BadRequest($"The Person with id {id} is not found");
@@ -90,11 +88,9 @@ namespace Entry.Controllers
                     var response = httresponsemessage.Result;
                     if (response.IsSuccessStatusCode)
                     {
-
                         var responseadd = client.DeleteAsync($"({url}{userpath}/{id.ToString()})").Result;
-                        //   var responseobject = response.Content.ReadAsStringAsync().Result;
-                        //  var responsejson = JsonConvert.SerializeObject(responseadd).Result;
-                        var result = JsonConvert.DeserializeObject<PersonModel>(response.Content.ReadAsStringAsync().Result);
+
+                        var result = responseadd.Content.ReadFromJsonAsync<PersonModel>();
                         return Ok(result);
                     }
                     return BadRequest($"The Person with id {id} was not found");
