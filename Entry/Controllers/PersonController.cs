@@ -1,5 +1,7 @@
 ﻿using BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace Entry.Controllers
 {
@@ -39,7 +41,7 @@ namespace Entry.Controllers
                     return Ok(response);
 
                 }
-                return BadRequest("Sorry the Person with id {id} cannot be found");
+                return BadRequest($"Sorry the Person with id {id} cannot be found");
 
 
             }
@@ -98,6 +100,38 @@ namespace Entry.Controllers
 
                 return BadRequest($"The Person with id {id} is not found");
             }
+
         }
+        [HttpGet("GetAllPersonRestClient")]
+        public ActionResult GetPeopleRestClient()
+        {
+            var client = new RestClient(url + userpath);
+            // client.Timeout = -1;
+            var request = new RestRequest();
+            RestResponse response = client.Execute(request);
+            // var result = response.Content.ToList();
+            var result = JsonConvert.DeserializeObject<List<PersonModel>>(response.Content.ToString());//.ToList();
+            return Ok(result);
+        }
+        [HttpPost("PostPersonRestClient")]
+        public IActionResult PostPersonRestClient(PersonModelContext model)
+        {
+            var client = new RestClient(url + userpath + "/");
+            //client.Timeout = -1;
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+
+            request.AddParameter("application/json", model, ParameterType.RequestBody);
+            RestResponse response = client.Execute(request);
+            if (response.IsSuccessful)
+            {
+                return Ok("Person Added Successfully, Congrats");
+            }
+            return BadRequest("Sorry, we were unable to add the person");
+
+
+            //Console.WriteLine(response.Content);
+        }
+
     }
 }
