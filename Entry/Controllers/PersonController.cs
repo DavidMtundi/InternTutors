@@ -63,7 +63,7 @@ namespace Entry.Controllers
 
             var response = await client.PostAsJsonAsync<PersonModelContext>($"{url}{userpath}/", model);
 
-            var result = await response.Content.ReadFromJsonAsync<PersonModel>();
+            //var result = await response.Content.ReadFromJsonAsync<PersonModel>();
             if (response.IsSuccessStatusCode)
             {
                 return Created(url, model);
