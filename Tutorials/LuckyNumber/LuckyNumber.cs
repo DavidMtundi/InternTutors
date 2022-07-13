@@ -8,26 +8,31 @@ namespace Tutorials.LuckyNumber
         {
             string? input = "";
             string? concatstring = "";
-            do
-            {
-                Console.WriteLine("");
-                Console.Write("Please Enter a Valid String, it should be only letters :  ");
-                input = Console.ReadLine();
-
-                concatstring = input.Replace(" ", string.Empty);
-
-
-            } while (!IsValidString(concatstring));
-
             double convertedNumbers;
             double[] dummyresult = Array.Empty<double>();
             double[] providedvalues = Array.Empty<double>();
             string resultfound = "";
 
+            do
+            {
+                Console.WriteLine("");
+                Console.Write("Please Enter a Valid String, it should be only letters :  ");
+                input = Console.ReadLine();
+                concatstring = input.Replace(" ", string.Empty);
+            }
+            while (!IsValidString(concatstring));
+
+
             //convert the string to a list of numbers with indexpoints;
             convertedNumbers = ConvertStringToDouble(concatstring);
             providedvalues = ConvertStringToDoubleArray(concatstring);
             resultfound = GetResult(providedvalues)[0].ToString();
+            //this is for the purpose of understanding
+            for (int i = 0; i < concatstring.Length; i++)
+            {
+                char character = concatstring[i];
+                Console.WriteLine($"the item at Location {i} is {character} and It's index is {GetCharacterPosition(character)}");
+            }
 
             Console.WriteLine($"The Lucky Number for this String {input} is {resultfound}");
             //  return resultfound;
@@ -43,20 +48,16 @@ namespace Tutorials.LuckyNumber
 
             int midvalue = (int)Math.Ceiling(midlength);
             double[] dummyresult = new double[midvalue];
-
             for (int i = 0; i < midvalue; i++)
             {
-
                 int subtractresult = intlength - i - 1;
                 if (subtractresult <= i)
                 {
                     dummyresult[i] = providedvalues[i];
-
                 }
                 else
                 {
                     dummyresult[i] = providedvalues[i] + providedvalues[subtractresult];
-
                 }
             }
             if (dummyresult.Length == 1)
@@ -77,10 +78,6 @@ namespace Tutorials.LuckyNumber
             // return dummyresult;
 
         }
-        //private static double[] ConvertStringToDoubleArray(string value)
-        //{
-        //    return Array.ConvertAll(value..split(','), Double.Parse);
-        //}
 
         private static double ConvertStringToDouble(string value)
         {
@@ -96,8 +93,6 @@ namespace Tutorials.LuckyNumber
             double[] converted = new double[value.Length];
             for (int i = 0; i < value.Length; i++)
             {
-                // Console.WriteLine(value[i].ToString());
-                // converted[i] = Convert.ToDouble(value[i]);
                 converted[i] = double.Parse(value[i].ToString());
             }
             return converted;
@@ -107,7 +102,6 @@ namespace Tutorials.LuckyNumber
             double[] converted = new double[value.Length];
             for (int i = 0; i < value.Length; i++)
             {
-                // Console.WriteLine(value[i].ToString());
                 converted[i] = GetCharacterPosition(char.Parse(value[i].ToString()));
             }
             return converted;
@@ -120,7 +114,6 @@ namespace Tutorials.LuckyNumber
                 if (regex.Matches(value)[0].Groups[0].Length == value.Length)
                 {
                     return true;
-
                 }
             }
             return false;
@@ -128,7 +121,6 @@ namespace Tutorials.LuckyNumber
         private static int GetCharacterPosition(char character)
         {
             return char.ToUpper(character) - 64;//index == 1
-
         }
 
     }
